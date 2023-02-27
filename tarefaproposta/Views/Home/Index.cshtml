@@ -1,0 +1,14 @@
+﻿@{
+    ViewData["Title"] = "Home Page";
+}
+@model HistoricoPropostaViewModel
+
+<div class="text-center">
+    <h1 class="display-4">Welcome</h1>
+    <div class="container">
+        <!-- Conteúdo da página -->
+        <!-- Incluindo a partial view -->
+        <partial name="_Proposta" for="@Model" />
+    </div>
+    <p>Learn about <a href="https://docs.microsoft.com/aspnet/core">building Web apps with ASP.NET Core</a>.</p>
+</div>

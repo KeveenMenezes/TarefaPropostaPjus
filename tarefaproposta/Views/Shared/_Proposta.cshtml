@@ -1,0 +1,114 @@
+﻿@using System.Globalization;
+@model HistoricoPropostaViewModel
+
+<style>
+    body {
+        font-family: Arial, sans-serif;
+        background-color: #F0F0F0;
+    }
+
+    .form-group {
+        margin-bottom: 20px;
+    }
+
+    label {
+        font-weight: bold;
+        display: block;
+    }
+
+    input[type="date"],
+    input[type="number"],
+    input[type="text"] {
+        border: 1px solid #CCC;
+        padding: 5px;
+        font-size: 16px;
+        width: 100%;
+        box-sizing: border-box;
+    }
+
+    button[type="submit"] {
+        background-color: #007BFF;
+        border: none;
+        color: #FFF;
+        padding: 10px 20px;
+        font-size: 16px;
+        border-radius: 5px;
+        cursor: pointer;
+    }
+
+    button[type="submit"]:hover {
+        background-color: #0069D9;
+    }
+</style>
+
+@using (Html.BeginForm("SalvarProposta", "Processo", FormMethod.Post, new { enctype = "multipart/form-data", id = "form-proposta" }))
+{
+    <div class="row">
+        <div class="col-sm-6 form-group">
+            <label for="data-proposta">Data da proposta:</label>
+            @Html.TextBoxFor(model => model.DataEnvio, new { type = "date", @class = "form-control", @required="required" })
+        </div>
+        <div class="col-sm-6 form-group">
+            <label for="valor-proposta">Valor da proposta:</label>
+            <div class="input-group">
+                <div class="input-group">
+                    <div class="input-group-prepend">
+                        <span class="input-group-text">R$</span>
+                    </div>
+                    @Html.TextBoxFor(model => model.ValorPropostaString, new { @class = "form-control", required = "required", data_inputmask = "'mask': '#.##0,00'", placeholder= "0,00" , @onblur = "formatCurrency(this)" })
+                    @Html.HiddenFor(model => model.ValorPropostaString)
+                    <script>
+                        function formatCurrency(input) {
+                            // Remove tudo que não for dígito ou vírgula
+                            let valor = input.value.replace(/[^\d,]/g, '');
+                            // Remove vírgulas extras
+                            let str = valor;
+                            let firstCommaIndex = str.indexOf(",");
+                            valor = str.slice(0, firstCommaIndex + 1) + str.slice(firstCommaIndex + 1).replace(/,/g, '');
+                            // Converte a vírgula para um ponto quando o valor chegar a 1000 ou mais
+                            if (!(valor.includes(','))) {
+                                valor += ',00';
+                            }
+                            let partes = valor.split(',');
+                            partes[0] = partes[0].replace(/(\d)(?=(\d{3})+$)/g, '$1.');
+                            partes[1] = partes[1].replace(/^(\d{2})|\d/g, '$1');
+                            valor = partes.join(',');
+                            input.value = valor;
+                        }
+
+                    </script>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="row">
+        <div class="col-sm-6 form-group">
+            <label for="contato">Forma de contato:</label>
+            @Html.DropDownListFor(model => model.Canal, EnumHelpers.GetEnumSelectList<Canal>(), "Selecione...", new { @class = "form-control", @required="required"})
+        </div>
+        <div class="col-sm-6 form-group">
+            <label for="destinado">Destinado para:</label>
+            @Html.DropDownListFor(model => model.Destinado, EnumHelpers.GetEnumSelectList<Destinado>(), "Selecione...", new { @class = "form-control",  @required="required"})
+        </div>
+    </div>
+    <button type="submit" class="btn btn-primary">Salvar</button>
+}
+
+
+@section scripts{
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery-validate/1.19.3/jquery.validate.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery-validation-unobtrusive/3.2.13/jquery.validate.unobtrusive.min.js"></script>
+    <script>
+        $(document).ready(function () {
+            $("#form-proposta").validate({
+                messages: {
+                    DataEnvio: "Este campo é obrigatório",
+                    ValorProposta: "Este campo é obrigatório",
+                    Canal: "Este campo é obrigatório",
+                    Destinado: "Este campo é obrigatório"
+                }
+            });
+        });
+    </script>
+}
